@@ -1,5 +1,58 @@
+"use client";
+import { useEffect } from "react";
 import Link from "next/link";
 export default function Home() {
+  useEffect(() => {
+    const canvas = document.getElementById("webCanvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = 400;
+    canvas.height = 250;
+
+    let points = [];
+
+    for (let i = 0; i < 30; i++) {
+      points.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        dx: Math.random() * 1 - 0.5,
+        dy: Math.random() * 1 - 0.5,
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      points.forEach((p, i) => {
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = "#2563eb";
+        ctx.fill();
+
+        points.forEach((p2, j) => {
+          let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 80) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = "rgba(37, 99, 235, 0.2)";
+            ctx.stroke();
+          }
+        });
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  }, []);
+
   return (
     <main>
       <nav className="bg-white shadow-md">
@@ -47,12 +100,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex-1 ">
-            <img
-              src="https://mobisoftinfotech.com/resources/wp-content/uploads/2022/04/next-JS-framework.png"
-              alt="Hero Image"
-              className="w-full rounded-md max-w-md mx-auto"
-            />
+          <div className="flex-1 flex justify-center">
+            <canvas
+              id="webCanvas"
+              className="w-full max-w-md h-64 bg-gray-100 rounded-md"
+            ></canvas>
           </div>
         </div>
       </section>
